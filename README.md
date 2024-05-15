@@ -149,6 +149,79 @@ $ gist REPORT.md
 3. Настройте сборочную процедуру на **TravisCI**.
 4. Настройте [Coveralls.io](https://coveralls.io/).
 
+```sh
+andrew@Ubuntu24Laby:~$ cd AndrewB203/workspacenew/lab05
+andrew@Ubuntu24Laby:~/AndrewB203/workspacenew/lab05$ cat>>CMakeLists.txt<<EOF
+> make_minimum_required(VERSION 3.4)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+project(banking_app)
+
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/third-party/CMake-codecov/cmake" ${CMAKE_MODULE_PATH})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/banking)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/banking)
+
+if (BUILD_TESTS)
+  add_subdirectory(third-party/gtest)
+  enable_testing()
+  include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+  include_directories(${gmock_SOURCE_DIR}/include ${gmock_SOURCE_DIR})  
+  file(GLOB ACCOUNT_TEST_SOURCES tests/*.cpp)
+  add_executable(check ${ACCOUNT_TEST_SOURCES})
+  target_link_libraries(check gtest transaction gtest_main account gmock)
+  add_test(NAME check COMMAND check)
+
+  if (BUILD_COVERAGE)
+    set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
+endif ()()ge_evaluate()MOVE_PATTERNS "'${PROJECT_SOURCE_DIR}/tests/*'")
+> EOF
+```
+
+```sh
+andrew@Ubuntu24Laby:~/AndrewB203/workspacenew/lab05$ cmake . -B build
+-- The C compiler identification is GNU 11.4.0
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/andrew/AndrewB203/workspacenew/lab05/build
+andrew@Ubuntu24Laby:~/AndrewB203/workspacenew/lab05$ cmake --build build
+[ 25%] Building CXX object banking/CMakeFiles/account.dir/Account.cpp.o
+[ 50%] Linking CXX static library libaccount.a
+[ 50%] Built target account
+[ 75%] Building CXX object banking/CMakeFiles/transaction.dir/Transaction.cpp.o
+[100%] Linking CXX static library libtransaction.a
+[100%] Built target transaction
+```
+
+```sh
+andrew@Ubuntu24Laby:~/AndrewB203/workspacenew/lab05$ cd .github/
+andrew@Ubuntu24Laby:~/AndrewB203/workspacenew/lab05/.github$ cat>>Config.yml<<EOF
+> EOF
+andrew@Ubuntu24Laby:~/AndrewB203/workspacenew/lab05/.github$ cd ..
+andrew@Ubuntu24Laby:~/AndrewB203/workspacenew/lab05$ cd banking
+andrew@Ubuntu24Laby:~/AndrewB203/workspacenew/lab05/banking$ cmake . -B build
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/andrew/AndrewB203/workspacenew/lab05/banking/build
+andrew@Ubuntu24Laby:~/AndrewB203/workspacenew/lab05/banking$ cmake --build build
+Consolidate compiler generated dependencies of target account
+[ 50%] Built target account
+Consolidate compiler generated dependencies of target transaction
+[100%] Built target transaction
+```
+
 ## Links
 
 - [C++ CI: Travis, CMake, GTest, Coveralls & Appveyor](http://david-grs.github.io/cpp-clang-travis-cmake-gtest-coveralls-appveyor/)
